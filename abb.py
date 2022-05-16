@@ -306,7 +306,7 @@ class Robot:
         '''
         caller = inspect.stack()[1][3]
         log.debug('%-14s sending: %s', caller, message)
-        self.sock.send(message)
+        self.sock.send(message.encode())
         time.sleep(self.delay)
         if not wait_for_response: return
         data = self.sock.recv(4096)

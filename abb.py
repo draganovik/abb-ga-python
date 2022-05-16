@@ -71,6 +71,12 @@ class Robot:
         self.scale_linear = units_l[linear]
         self.scale_angle  = units_a[angular]
 
+    def check_reachibility(self, pose):
+        msg = "37 #"
+        ret = self.send(msg)
+        # parse to True/False
+        return True
+
     def set_cartesian(self, pose):
         '''
         Executes a move immediately from the current pose,

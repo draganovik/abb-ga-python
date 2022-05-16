@@ -1,4 +1,6 @@
 import json
+import time
+
 from pyquaternion import Quaternion
 
 import abb
@@ -37,9 +39,18 @@ def main():
     quat = Quaternion(axis=[0, 1, 0], degrees=180)
     target = [xyz, quat.q]
 
-    for robot in robots:
-        print(f"Controlling {robot}")
-        robots[robot].set_cartesian(target)
+    xyz_list = [[500, i * 50, 350] for i in range(5)]
+    quat_list =[quat.q for i in range(5)]
+
+    target_list = [[xyz, q] for xyz, q in zip(xyz_list, quat_list)]
+
+    for target in target_list:
+        for robot in robots:
+            print(target)
+            robots[robot].set_cartesian(target)
+        time.sleep(0.5)
+
+
 
 
 if __name__ == "__main__":

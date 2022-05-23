@@ -1,21 +1,17 @@
 MODULE SERVER
 
-!////////////////
-!GLOBAL VARIABLES
-!////////////////
-
 !//Robot configuration
 PERS tooldata currentTool := [TRUE,[[0,0,0],[1,0,0,0]],[0.001,[0,0,0.001],[1,0,0,0],0,0,0]];    
 PERS wobjdata currentWobj := [FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];   
-PERS speeddata currentSpeed;
-PERS zonedata currentZone;
+VAR speeddata currentSpeed;
+VAR zonedata currentZone;
 
 !// Clock Synchronization
-PERS bool startLog:=TRUE;
-PERS bool startRob:=TRUE;
+VAR bool startLog:=TRUE;
+VAR bool startRob:=TRUE;
 
 !// Mutex between logger and changing the tool and work objects
-PERS bool frameMutex:=FALSE;
+VAR bool frameMutex:=FALSE;
 
 !//PC communication
 VAR socketdev clientSocket;
@@ -25,8 +21,8 @@ VAR num params{10};
 VAR num nParams;
 
 !PERS string ipController:= "192.168.125.1"; !robot default IP
-PERS string ipController:= "127.0.0.1"; !local IP for testing in simulation
-PERS num serverPort:= 5000;
+VAR string ipController:= "127.0.0.1"; !local IP for testing in simulation
+VAR num serverPort:= 5000;
 
 !//Motion of the robot
 VAR robtarget cartesianTarget;
@@ -479,5 +475,34 @@ ERROR (LONG_JMP_ALL_ERR)
             RETRY;
     ENDTEST
 ENDPROC
+
+FUNC bool IsReachable(robtarget pReach, PERS tooldata ToolReach, PERS wobjdata WobjReach)
+
+  ! Check if specified robtarget can be reach with given tool and wobj.
+  !
+  ! Output:
+  !  Return TRUE if given robtarget is reachable with given tool and wobj
+  !  otherwise return FALSE
+  !
+  ! Parameters:
+  !  pReach     - robtarget to be checked, if robot can reach this robtarget
+  !  ToolReach  - tooldata to be used for possible movement
+  !  WobjReach  - wobjdata to be used for possible movement
+
+  VAR bool bReachable;
+  VAR jointtarget jntReach;
+
+  bReachable := TRUE;
+
+  jntReach := CalcJointT(pReach, ToolReach\Wobj:=WobjReach);
+
+  RETURN bReachable;
+
+  ERROR
+   IF ERRNO = ERR_ROBLIMIT THEN
+    bReachable := FALSE;
+    TRYNEXT;
+   ENDIF
+  ENDFUNC
 
 ENDMODULE

@@ -137,7 +137,24 @@ def complete_plot(solution):
     plt.show()
 
 
-if __name__ == "__main__":
+def format_sol(solution):
+    info = solution[0:Config.n_robots - 1]  # dobijamo listu elemenata
+    targetsIdx = solution[Config.n_robots - 1:]
+    targets = [TARGET_LIST[i] for i in targetsIdx]
+
+    sol_list = []
+
+    prevIndx = 0
+    for i in info:
+        subTargets = targets[prevIndx:i]
+        sol_list.append(subTargets)
+        prevIndx = i
+
+    sol_list.append(targets[prevIndx:])
+    return sol_list
+
+
+def get_best_solution():
     ga_instance = pygad.GA(
         num_generations=40,
         initial_population=POPULATION,
@@ -161,3 +178,5 @@ if __name__ == "__main__":
     print(f"Time: {end-start:.5f}")
     complete_plot(best_sol)
     ga_instance.plot_fitness()
+
+    return format_sol(best_sol)

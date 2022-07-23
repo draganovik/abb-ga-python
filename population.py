@@ -17,8 +17,8 @@ class Config:
 
 TARGET_LIST = [
     (x, y) for x, y in zip(
-        np.random.randint(0, 300, size=Config.n_targets),
-        np.random.randint(0, 300, size=Config.n_targets)
+        np.random.randint(10, 290, size=Config.n_targets),
+        np.random.randint(10, 290, size=Config.n_targets)
     )
 ]
 DIST_MAP = cdist(np.array(TARGET_LIST), np.array(TARGET_LIST))

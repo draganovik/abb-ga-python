@@ -9,6 +9,9 @@ Finds locally best ways from L starting points with [M0, M1, ..., ML] robots
 through points_number Points and back to their service center
 '''
 
+np.random.seed(1984)
+random.seed(1)
+
 
 def fitness_pop(population, dist, robots):
     fitness_result = np.zeros(len(population))

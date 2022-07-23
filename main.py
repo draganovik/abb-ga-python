@@ -2,7 +2,6 @@ from dis import dis
 import json
 from math import dist
 import time
-import asyncio
 
 from pyquaternion import Quaternion
 
@@ -60,30 +59,30 @@ def main_ga():
     config_json = json.load(file)
     robots = init_robots(config_json)
 
+    for robot in robots:
+        robots[robot].set_speed([150,75,75,75])
+
     xyz = [59.969,35.434,0]
     quat = Quaternion(axis=[0, 1, 0], degrees=180)
     target = [xyz, quat.q]
 
     sol_2d = get_best_solution()
-    print('from 2d', sol_2d)
+
     xyz_list = []
     for rob in sol_2d:
         xyz_list.append([])
         for point in rob:
             xyz_list[-1].append([point[0], point[1], 0])
-    print('to 3d', xyz_list)
 
     quat_list = []
     for rob in sol_2d:
         quat_list.append([])
         for point in rob:
             quat_list[-1].append(quat.q)
-    print('quad', quat_list)
 
     robo1_target = [[xyz, q] for xyz, q in zip(xyz_list[0], quat_list[0])]
     robo2_target = [[xyz, q] for xyz, q in zip(xyz_list[1], quat_list[1])]
     target_list = [robo1_target, robo2_target]
-    print(target_list)
 
     r1 = 0
     r2 = 0
@@ -104,10 +103,7 @@ def main_ga():
         time.sleep(2)
 
     for robot in robots:
-        asyncio.run(move_robo_async(robots[robot], robots_init_target[robot]))
-
-async def move_robo_async(robo, pos):
-    await robo.set_cartesian(pos)
+        robots[robot].set_cartesian(robots_init_target[robot])
 
 if __name__ == "__main__":
     main_ga()

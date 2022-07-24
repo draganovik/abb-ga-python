@@ -1,11 +1,10 @@
 import time
-
 import pygad
 import numpy as np
-from population import *
 from collections import deque
 import matplotlib.pyplot as plt
 
+from population import *
 
 def single_fitness(solution):
     if len(solution) <= Config.n_targets//2 - 1:
@@ -16,7 +15,6 @@ def single_fitness(solution):
         distance += DIST_MAP[idx1, idx2]
 
     return distance
-
 
 def fitness(solution, solution_idx):
     totalDistance = 0
@@ -32,7 +30,6 @@ def fitness(solution, solution_idx):
     totalDistance += single_fitness(targets[prevIndx:])
 
     return -totalDistance
-
 
 def ocx(p1, p2, size):
     """ Ordered cycle crossover"""
@@ -51,7 +48,6 @@ def ocx(p1, p2, size):
 
     child.rotate(indx1)
     return child
-
 
 def crossover(parents, child_size, ga_inst):
     # child_size je tuple (broj potrebne dece, duzina jedne jedinke)
@@ -76,7 +72,6 @@ def crossover(parents, child_size, ga_inst):
 
     return np.array(children)
 
-
 def mutate(child, ga_inst):
     info = child[0:Config.n_robots - 1]  # dobijamo listu elemenata
     targets = child[Config.n_robots - 1:]
@@ -98,7 +93,6 @@ def mutate(child, ga_inst):
     mutated.extend(targets)
     return mutated
 
-
 def plot(solution):
     xs = [x for x, y in TARGET_LIST]
     ys = [y for x, y in TARGET_LIST]
@@ -119,9 +113,6 @@ def plot(solution):
     x2, y2 = t2
     plt.plot([x1, x2], [y1, y2])
 
-    # plt.show()
-
-
 def complete_plot(solution):
     info = solution[0:Config.n_robots - 1]  # dobijamo listu elemenata
     targets = solution[Config.n_robots - 1:]
@@ -135,7 +126,6 @@ def complete_plot(solution):
     plot(targets[prevIndx:])
 
     plt.show()
-
 
 def format_sol(solution):
     info = solution[0:Config.n_robots - 1]  # dobijamo listu elemenata
@@ -152,7 +142,6 @@ def format_sol(solution):
 
     sol_list.append(targets[prevIndx:])
     return sol_list
-
 
 def get_best_solution():
     ga_instance = pygad.GA(
@@ -177,6 +166,6 @@ def get_best_solution():
 
     print(f"Time: {end-start:.5f}")
     complete_plot(best_sol)
-    ga_instance.plot_fitness()
+    #ga_instance.plot_fitness()
 
     return format_sol(best_sol)

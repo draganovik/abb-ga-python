@@ -13,7 +13,6 @@ import socket
 import json 
 import time
 import inspect
-from threading import Thread
 from collections import deque
 import logging
 
@@ -72,10 +71,10 @@ class Robot:
         self.scale_angle  = units_a[angular]
 
     def check_reachibility(self, pose):
-        msg = "37 #"
-        ret = self.send(msg)
+        msg = "37 " + self.format_pose(pose)
+        data = self.send(msg).split()
         # parse to True/False
-        return True
+        return data[2] == b'REACHABLE'
 
     def set_cartesian(self, pose):
         '''
@@ -273,7 +272,7 @@ class Robot:
         msg = "33 #"
         return self.send(msg)
 
-    def set_external_axis(self, axis_unscaled=[-550,0,0,0,0,0]):
+    def set_external_axis(self, axis_values=[-550,0,0,0,0,0]):
         if len(axis_values) != 6: return False
         msg = "34 "
         for axis in axis_values:

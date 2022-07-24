@@ -22,10 +22,6 @@ TARGET_LIST = [
     )
 ]
 DIST_MAP = cdist(np.array(TARGET_LIST), np.array(TARGET_LIST))
-# POPULATION = [
-#     list(np.random.choice(list(range(Config.n_targets)), size=Config.n_targets, replace=False))
-#     for _ in range(Config.pop_size)
-# ]
 
 POPULATION = []
 for i in range(Config.pop_size):

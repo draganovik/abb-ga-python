@@ -10,7 +10,7 @@ from scipy.spatial.distance import cdist
 class Config:
     n_targets = 12
     n_robots = 2
-    pop_size = 2000
+    pop_size = 800
 
     parents_mating = int(0.2 * pop_size)
 

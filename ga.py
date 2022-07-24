@@ -145,16 +145,16 @@ def format_sol(solution):
 
 def get_best_solution():
     ga_instance = pygad.GA(
-        num_generations=40,
+        num_generations=60,
         initial_population=POPULATION,
         gene_type=int,
 
         mutation_type=mutate,
-        mutation_probability=0.5,
+        mutation_probability=0.4,
 
         # parent_selection_type="sss",
         num_parents_mating=Config.parents_mating,
-        keep_parents=200,
+        keep_parents=20,
 
         fitness_func=fitness,
         crossover_type=crossover
@@ -166,6 +166,6 @@ def get_best_solution():
 
     print(f"Time: {end-start:.5f}")
     complete_plot(best_sol)
-    #ga_instance.plot_fitness()
+    ga_instance.plot_fitness()
 
     return format_sol(best_sol)

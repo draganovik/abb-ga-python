@@ -74,7 +74,6 @@ def check_targets(target_list, robot_list : list[abb.Robot]):
 
     for chrom in POPULATION:
         for invalid_target in invalid_targets:
-            TARGET_LIST.remove(invalid_target)
             chrom = [target for index, target in enumerate(chrom) if target != invalid_target or index < Config.n_robots -1]
             for index, value in enumerate(chrom):
                 if index > Config.n_robots -1:
@@ -91,7 +90,7 @@ def main():
     check_targets(TARGET_LIST,robots)
 
     xy_list = get_best_solution()
-    print(xy_list)
+    #print(xy_list)
     target_list = create_targets(xy_list)
 
     robots_init_target = dict()

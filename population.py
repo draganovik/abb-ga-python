@@ -1,10 +1,5 @@
 import numpy as np
-import random
 from scipy.spatial.distance import cdist
-
-#seed = 1984
-# np.random.seed(seed)
-# random.seed(seed)
 
 
 class Config:

@@ -72,14 +72,14 @@ def check_targets(target_list, robot_list : list[abb.Robot]):
         invalid_values = list(target_list[index] for index in invalid_targets)
         print(invalid_values, '\n')
 
-    for chrom in POPULATION:
+    """ for chrom in POPULATION:
         for invalid_target in invalid_targets:
             chrom = [target for index, target in enumerate(chrom) if target != invalid_target or index < Config.n_robots -1]
             for index, value in enumerate(chrom):
                 if index > Config.n_robots -1:
                     break
                 if value > len(chrom) - Config.n_robots :
-                    chrom[index] = value - 1
+                    chrom[index] = value - 1 """
 
 def main():
     file = open("config.json")
@@ -108,7 +108,7 @@ def main():
             elif r2 < len(target_list[1]):
                 robots[robot].set_cartesian(target_list[1][r2])
                 r2 += 1
-        time.sleep(2)
+        time.sleep(1)
 
     for robot in robots:
         robots[robot].set_cartesian(robots_init_target[robot])

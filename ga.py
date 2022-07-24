@@ -18,7 +18,7 @@ def single_fitness(solution):
 
 def fitness(solution, solution_idx):
     totalDistance = 0
-    info = solution[0:Config.n_robots - 1]  # dobijamo listu elemenata
+    info = solution[0:Config.n_robots - 1]
     targets = solution[Config.n_robots - 1:]
 
     prevIndx = 0
@@ -32,8 +32,6 @@ def fitness(solution, solution_idx):
     return -totalDistance
 
 def ocx(p1, p2, size):
-    """ Ordered cycle crossover"""
-
     indx1 = np.random.randint(0, size)
     indx2 = np.random.randint(0, size)
     if indx2 < indx1:
@@ -50,14 +48,12 @@ def ocx(p1, p2, size):
     return child
 
 def crossover(parents, child_size, ga_inst):
-    # child_size je tuple (broj potrebne dece, duzina jedne jedinke)
     children = []
     idx = 0
     while len(children) != child_size[0]:
         p1_with_info = parents[idx % len(parents)].copy()
         p2_with_info = parents[(idx + 1) % len(parents)].copy()
         info1 = p1_with_info[0:Config.n_robots-1]
-        #info2 = p2_with_info[0:Config.n_robots-1]
         p1 = p1_with_info[Config.n_robots-1:]
         p2 = p2_with_info[Config.n_robots-1:]
 
@@ -73,7 +69,7 @@ def crossover(parents, child_size, ga_inst):
     return np.array(children)
 
 def mutate(child, ga_inst):
-    info = child[0:Config.n_robots - 1]  # dobijamo listu elemenata
+    info = child[0:Config.n_robots - 1]
     targets = child[Config.n_robots - 1:]
 
     id1, id2 = np.random.randint(
@@ -114,7 +110,7 @@ def plot(solution):
     plt.plot([x1, x2], [y1, y2])
 
 def complete_plot(solution):
-    info = solution[0:Config.n_robots - 1]  # dobijamo listu elemenata
+    info = solution[0:Config.n_robots - 1]
     targets = solution[Config.n_robots - 1:]
 
     prevIndx = 0
@@ -128,7 +124,7 @@ def complete_plot(solution):
     plt.show()
 
 def format_sol(solution):
-    info = solution[0:Config.n_robots - 1]  # dobijamo listu elemenata
+    info = solution[0:Config.n_robots - 1]
     targetsIdx = solution[Config.n_robots - 1:]
     targets = [TARGET_LIST[i] for i in targetsIdx]
 
@@ -152,7 +148,6 @@ def get_best_solution():
         mutation_type=mutate,
         mutation_probability=0.4,
 
-        # parent_selection_type="sss",
         num_parents_mating=Config.parents_mating,
         keep_parents=20,
 

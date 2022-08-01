@@ -1,21 +1,17 @@
 MODULE SERVER
 
-!////////////////
-!GLOBAL VARIABLES
-!////////////////
-
 !//Robot configuration
-PERS tooldata currentTool := [TRUE,[[0,0,0],[1,0,0,0]],[0.001,[0,0,0.001],[1,0,0,0],0,0,0]];    
-PERS wobjdata currentWobj := [FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];   
-PERS speeddata currentSpeed;
-PERS zonedata currentZone;
+PERS tooldata currentTool := [TRUE,[[0,0,100],[1,0,0,0]],[0.001,[0,0,0.001],[1,0,0,0],0,0,0]];
+PERS wobjdata currentWobj := [FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[170,390,30],[1,0,0,0]]];  
+VAR speeddata currentSpeed;
+VAR zonedata currentZone;
 
 !// Clock Synchronization
-PERS bool startLog:=TRUE;
-PERS bool startRob:=TRUE;
+VAR bool startLog:=TRUE;
+VAR bool startRob:=TRUE;
 
 !// Mutex between logger and changing the tool and work objects
-PERS bool frameMutex:=FALSE;
+VAR bool frameMutex:=FALSE;
 
 !//PC communication
 VAR socketdev clientSocket;
@@ -24,8 +20,9 @@ VAR num instructionCode;
 VAR num params{10};
 VAR num nParams;
 
-PERS string ipController:= "192.168.125.1"; !robot default IP
-PERS num serverPort:= 5000;
+!PERS string ipController:= "192.168.125.1"; !robot default IP
+VAR string ipController:= "127.0.0.1"; !local IP for testing in simulation
+VAR num serverPort:= 5001;
 
 !//Motion of the robot
 VAR robtarget cartesianTarget;
@@ -48,6 +45,7 @@ VAR robtarget circPoint;
 VAR num ok;
 CONST num SERVER_BAD_MSG :=  0;
 CONST num SERVER_OK := 1;
+VAR errnum ERNO;
 
 
 
@@ -260,10 +258,10 @@ PROC main()
 		
             CASE 6: !Set Tool
                 IF nParams = 7 THEN
-					WHILE (frameMutex) DO
-						WaitTime .01; !// If the frame is being used by logger, wait here
-					ENDWHILE
-					frameMutex:= TRUE;
+		   WHILE (frameMutex) DO
+		        WaitTime .01; !// If the frame is being used by logger, wait here
+		   ENDWHILE
+		frameMutex:= TRUE;
                     currentTool.tframe.trans.x:=params{1};
                     currentTool.tframe.trans.y:=params{2};
                     currentTool.tframe.trans.z:=params{3};
@@ -272,6 +270,7 @@ PROC main()
                     currentTool.tframe.rot.q3:=params{6};
                     currentTool.tframe.rot.q4:=params{7};
                     ok := SERVER_OK;
+		    frameMutex:= FALSE;
                 ELSE
                     ok:=SERVER_BAD_MSG;
                 ENDIF
@@ -400,6 +399,26 @@ PROC main()
                 ELSE
                     ok:=SERVER_BAD_MSG;
                 ENDIF
+                
+            CASE 37: !check reacability of a pose
+                IF nParams = 7 THEN
+                    cartesianTarget := [[params{1},params{2},params{3}],
+                                [params{4},params{5},params{6},params{7}],
+                                [0,0,0,0],
+                                externalAxis];
+                    
+                    jointsPose := CalcJointT(cartesianTarget, currentTool \WObj:=currentWobj \ErrorNumber:=ERNO);
+                    IF ERNO = 0 THEN
+                        addString := "REACHABLE";
+                    ELSEIF ERNO = ERR_OUTSIDE_REACH THEN
+                        addString := "ERR_OUTSIDE_REACH";
+                    ELSE
+                        addString := "ERROR_" + NumToStr(ERNO,0);
+                    ENDIF
+                    ok := SERVER_OK;
+                ELSE
+                    ok :=SERVER_BAD_MSG;
+                ENDIF
 				
             CASE 98: !returns current robot info: serial number, robotware version, and robot type
                 IF nParams = 0 THEN
@@ -459,7 +478,7 @@ ERROR (LONG_JMP_ALL_ERR)
             SocketClose serverSocket;
             !//Reinitiate the server
             ServerCreateAndConnect ipController,serverPort;
-            reconnected:= TRUE;
+            reconnected:= FALSE;
             connected:= TRUE;
             RETRY; 
         DEFAULT:
@@ -472,10 +491,39 @@ ERROR (LONG_JMP_ALL_ERR)
             SocketClose serverSocket;
             !//Reinitiate the server
             ServerCreateAndConnect ipController,serverPort;
-            reconnected:= TRUE;
+            reconnected:= FALSE;
             connected:= TRUE;
             RETRY;
     ENDTEST
 ENDPROC
+
+FUNC bool IsReachable(robtarget pReach, PERS tooldata ToolReach, PERS wobjdata WobjReach)
+
+  ! Check if specified robtarget can be reach with given tool and wobj.
+  !
+  ! Output:
+  !  Return TRUE if given robtarget is reachable with given tool and wobj
+  !  otherwise return FALSE
+  !
+  ! Parameters:
+  !  pReach     - robtarget to be checked, if robot can reach this robtarget
+  !  ToolReach  - tooldata to be used for possible movement
+  !  WobjReach  - wobjdata to be used for possible movement
+
+  VAR bool bReachable;
+  VAR jointtarget jntReach;
+
+  bReachable := TRUE;
+
+  jntReach := CalcJointT(pReach, ToolReach\Wobj:=WobjReach);
+
+  RETURN bReachable;
+
+  ERROR
+   IF ERRNO = ERR_ROBLIMIT THEN
+    bReachable := FALSE;
+    TRYNEXT;
+   ENDIF
+  ENDFUNC
 
 ENDMODULE
